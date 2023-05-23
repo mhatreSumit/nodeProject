@@ -1,52 +1,46 @@
+const express = require('express')
+const bodyParser = require('body-parser')
+const mongoose = require('mongoose')
+const path = require('path');
+const cors = require('cors');
+const app = express();
+// const dbConfig = require('./config/dbConfig');
+app.options('*', cors());
+app.use(cors());
+require('dotenv').config({ path: path.join(__dirname, '.env') });
+
+//body-parser
+// parse requests of content-type - application/json
+app.use(bodyParser.json());
+
+// parse requests of content-type - application/x-www-form-urlencoded
+app.use(bodyParser.urlencoded({ extended: true }));
 
 
-const express = require("express")
-const path = require('path')
-var bodyParser = require('body-parser')
-const app = express()
+//routes
+const userRouter = require('./routes/userRoutes')
+app.use('/', userRouter)
 
-app.use(bodyParser.urlencoded({ extended: false }))
-app.use(bodyParser.json())
+//db connection
+mongoose.set('debug', true);
+mongoose.Promise = global.Promise;
 
-app.set("views", path.join(__dirname))
-app.set("view engine", "ejs")
+mongoose.connect(process.env.MONGO_DATABASE, {
+    useNewUrlParser: true,
+    useUnifiedTopology: true,
+    autoIndex: false, // Don't build indexes
+    serverSelectionTimeoutMS: 5000, // Keep trying to send operations for 5 seconds
+    socketTimeoutMS: 45000, // Close sockets after 45 seconds of inactivity
+    family: 4 // Use IPv4, skip trying IPv6
+}).then(() => {
+    console.log("Successfully connected to the database");
+}).catch(err => {
+    console.log('Could not connect to the database. Exiting now...', err);
+    //process.exit();
+});
 
-app.get("/user/:start/:end", function (req, res) {
-    // URL : http://localhost:3000/user/1/10?name=sumit&id=5050
-    let start = req.params.start
-    let end = req.params.end
+app.listen(5000, () => {
+    console.log("Server is listening on port 5000");
+});
 
-    var name = req.query.name
-    var id = req.query.id
-
-    console.log("Name :", name)
-    console.log("id :", id)
-    res.json({ name: name, id: id, start: start, end: end });
-})
-
-app.post("/", function (req, res) {
-    // URL : http://localhost:3000/
-
-    /* 
-   JSON: {
-  "name":"sumit",
-  "id":"20020",
-  "start":10, 
-  "end":30
-         } */
-
-    let result = []
-    let data = req.body;
-
-
-    for (const key in data) {
-        console.log(data[key]);
-        result.push(data[key])
-    }
-    return res.status(200).send(result)
-
-})
-app.listen(3000, function (error) {
-    if (error) throw error
-    console.log("Server created Successfully on PORT", 3000)
-})
+module.exports = app;

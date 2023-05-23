@@ -1,8 +1,8 @@
 # nodeProject
-Promoise to display a mesaage and cal the promise
+Create a node Express server.
 
-Create a file using fs module and async/await
+Connect to mongo DB.
 
-Create a GET api that returns query param, path param and return both values with info as json
+Create API to create users, update a user and get list of users.
 
-Create a POST api which acccepts a JSON data. Return an array of data.
+Add proper logs Write unit tests to test your code.
