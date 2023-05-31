@@ -2,7 +2,7 @@ function displayMessage(value) {
     console.log(value);
 }
 
-let promise = true;
+let promise = false;
 let message = '';
 
 const promiseChecker = new Promise((resolve, reject) => {
